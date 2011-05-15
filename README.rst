@@ -1,5 +1,5 @@
 =========================================================
-Java/Android + Python/Django AES encypted communication
+Java/Android + Python/Django AES encrypted communication
 =========================================================
 
 This repository hosts project that allows communication between Django/Python and Android/Java application with AES encrypted data (probably through HTTP).
