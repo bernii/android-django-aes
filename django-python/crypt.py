@@ -9,9 +9,16 @@ from Crypto.Cipher import AES
 import base64
 
 #Define exceptions
-class NoPadInString(Exception): pass  
+class NoPadInString(Exception):
+    '''
+    String doesn't have padding character 
+    '''
+    pass  
 
 class Cipher(object):
+    '''
+    Cryptography class for Android/Java communication
+    '''
     # the block size for the cipher object; must be 16, 24, or 32 for AES
     BLOCK_SIZE = 32
     
@@ -28,17 +35,32 @@ class Cipher(object):
 
     # pad the text to be encrypted
     @classmethod
-    def pad(cls,s):
-        return s + (cls.BLOCK_SIZE - len(s) % cls.BLOCK_SIZE) * cls.PADDING
+    def pad(cls, unpadded_str):
+        '''
+        Add padding to unpadded string
+        @param cls:
+        @param unpadded_str:
+        '''
+        return unpadded_str + (cls.BLOCK_SIZE - len(unpadded_str) % cls.BLOCK_SIZE) * cls.PADDING
     
     @classmethod
-    def encrypt(cls,string):
+    def encrypt(cls, decoded):
+        '''
+        Encrypt decoded with AES
+        @param cls:
+        @param decoded: stringto encrypt
+        '''
         # add length before se we know which characters are padded only
-        with_pad = "".join([str(len(string.decode("utf8"))),"|",string])
+        with_pad = "".join([str(len(decoded.decode("utf8"))), "|", decoded])
         return base64.b64encode(cls.cipher.encrypt(cls.pad(with_pad)))
     
     @classmethod
-    def decrypt(cls,encoded):
+    def decrypt(cls, encoded):
+        '''
+        Decrypt AES coded string and strip padding characters
+        @param cls:
+        @param encoded:
+        '''
         whole = cls.cipher.decrypt(base64.b64decode(encoded)).rstrip(cls.PADDING)
         pad = whole.find("|")
         if pad == -1:
@@ -54,7 +76,9 @@ import sys
 import getopt
 
 def main():
-    # parse command line options
+    '''
+    Command line for testing purposes
+    '''
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hed", ["help"])
     except getopt.error, msg:
@@ -63,22 +87,22 @@ def main():
         sys.exit(2)
     # process options
     action = "d" 
-    file = ""
+    in_file = ""
    
-    for o, a in opts:
-        if o in ("-h", "--help"):
+    for opt, a in opts:
+        if opt in ("-h", "--help"):
             print __doc__
             sys.exit(0)
-        elif o in ("-e", "--encrypt"):
+        elif opt in ("-e", "--encrypt"):
             action = "e" 
-            file = args[0]
-        elif o in ("-d", "--decrypt"):
-            file = args[0]			
-	fileString = open(file, 'r').read()
+            in_file = args[0]
+        elif opt in ("-d", "--decrypt"):
+            in_file = args[0]			
+    file_string = open(in_file, 'r').read()
     if action == "e":
-        sys.stdout.write(Cipher.encrypt(fileString))
+        sys.stdout.write(Cipher.encrypt(file_string))
     else:
-        sys.stdout.write(Cipher.decrypt(fileString))
+        sys.stdout.write(Cipher.decrypt(file_string))
         
 if __name__ == "__main__":
     main()

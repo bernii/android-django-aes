@@ -4,11 +4,15 @@ Created on 2011-05-15
 
 @author: berni
 '''
-
 import unittest
 from crypt import Cipher
+import sys
+
 
 class KnownValues(unittest.TestCase):                                   
+    '''
+    Known input and output values
+    '''
     knownValues = ( 
                     (
                      "123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|} ", 
@@ -16,25 +20,28 @@ class KnownValues(unittest.TestCase):
                      ),    
                   )                               
 
-    def testKnownValues(self):                                   
+    def test_known_values(self):                                   
         """encrypt should give known result with known input"""
         for clear_text, encrypted_text in self.knownValues:              
             result = Cipher.encrypt(clear_text)          
             self.assertEqual(encrypted_text, result)        
+
             
 class SanityCheck(unittest.TestCase):        
-    def testSanity(self):                    
-        """decrypt(encrypt(str))==str for all unicode chars"""
-        import sys
+    '''
+    Sanity check test case
+    '''
+    def test_sanity(self):                    
+        """decrypt(encrypt(instr))==instr for all unicode chars"""
         chars = []
-        for i in xrange(0,sys.maxint):
+        for i in xrange(0, sys.maxint):
             try:
                 chars.append(unichr(i))
             except ValueError:
 #                print i," not in range"
                 break 
-        str = "".join(chars).encode('utf8')
-        self.assertEqual(str, Cipher.decrypt(Cipher.encrypt(str)))
+        instr = "".join(chars).encode('utf8')
+        self.assertEqual(instr, Cipher.decrypt(Cipher.encrypt(instr)))
             
 if __name__ == "__main__":
     unittest.main()
